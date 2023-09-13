@@ -119,6 +119,7 @@ function attach(piece){
         if (y<0){
             console.log("Defeat")
             endGame()
+            return
         }
         color=piece.color
         uploadObj.push({info:1, color:color})
@@ -407,7 +408,8 @@ document.addEventListener('keydown', (event) => {
     if (testPiece2.flagBottom){return}//gaurd clause.  
     if (pauseFlag===true){
         return
-    }//don't move when paused.  
+    }//don't move when paused.
+    if (gameOnGoingFlag===false){return}  
     var name = event.key;
     var code = event.code;
 
@@ -469,6 +471,11 @@ function endGame(){
     clearInterval(myTimer)
     gameOnGoingFlag=false
     timeSet=1000
+    columnsBlock=[]
+    for (let i=0; i<COLUMNS;i++){
+        columnsBlock.push([])
+    }
+
 }
 
 function newGame(){
