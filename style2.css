@@ -1,0 +1,55 @@
+.banner {  
+    position: relative;
+    left: 2vw;
+    box-sizing: border-box;
+    width: 96vw;
+    height: 14vh;
+    top: 0;
+    background: #D4A373;
+    border: 4px solid #F4A261;
+    border-radius: 4px;
+    margin: 0px;
+  
+    box-shadow: 8px 8px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .wrapper {
+    border: 1px solid #F4A261;
+    width: 80px;
+    border-radius: 10px;
+    background: #FAEDCD;
+    display: flexbox;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    height:3vh
+  
+  }
+
+  header 
+{
+  height: 8.3vh; 
+  display: flex; 
+  display: flex; 
+  flex-direction: row;
+  justify-content: space-evenly; 
+  align-items: center;
+  color: darkslategray;
+}
+
+.navigation-box
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  width: 98vw;
+  height: 8.3vh;
+  background: #D4A373;
+}
+
+.demo
+{
+    width: 15vw;
+    height:20vh;
+}

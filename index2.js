@@ -13,59 +13,6 @@ var pauseFlag=false;
 var gameOnGoingFlag=false;
 const speedGauge = document.querySelector('.gauge')
 
-
-
-
-
-var pieceDictionary = {
-    1:[[-1,0],[-1,1],[-1,2],[-1,3],[-1,4]],
-    2:[[0,2],[-1,2],[-1,3],[-1,4],[-1,5]],
-    5:[[0,5],[-1,2],[-1,3],[-1,4],[-1,5]],
-    3:[[0,3],[-1,2],[-1,3],[-1,4],[-1,5]],
-    4:[[0,4],[-1,2],[-1,3],[-1,4],[-1,5]], 
-    6:[[0,2],[-1,2],[-1,3],[-1,4],[0,3]],
-    7:[[0,4],[-1,2],[-1,3],[-1,4],[0,3]],
-    8:[[0,1],[-1,2],[-1,3],[-1,4],[0,2]],
-    14:[[-1,2],[-1,3],[-1,4],[0,4],[0,5]],
-    9:[[0,3],[-1,2],[-1,3],[-1,4],[1,3]],
-    10:[[0,2],[-1,2],[-1,3],[-1,4],[1,2]],
-    11:[[0,2],[0,3],[-1,3],[-1,4],[1,2]],
-    12:[[1,3],[0,2],[0,3],[0,4],[-1,3]],
-    13:[[0,2],[-1,2],[-1,3],[-1,4],[0,4]]
- }
- 
- var pieceCenter = {
-    1:[-1,3],
-    2:[-1,3],
-    3:[-1,3],
-    4:[-1,3],
-    5:[-1,3],
-    6:[-1,3],
-    7:[-1,3],
-    8:[-1,3],
-    9:[-1,3],
-    10:[-1,3],
-    11:[-1,3],
-    12:[-1,3],
-    13:[-1,3],
-    14:[-1,3]
-}
-var pieceColor ={
-    1:"aqua",
-    2:"blue",
-    3:"yellow",
-    4:"green",
-    5:"orange",
-    6:"black",
-    7:"pink",
-    8:"purple",
-    9:"aqua",
-    10:"palegreen",
-    11:"dimgray",
-    12:"plum",
-    13:"navy",
-    14:"grey"
-}
 let speedDict={
     0:1000,
     1:800,
@@ -101,12 +48,12 @@ for (let i=0; i<COLUMNS;i++){
     columnsBlock.push([])
 }
 
-intiliaze(c,ctx)
-intiliaze(nextWindow,pieceCtx)
+initialize(c,ctx)
+initialize(nextWindow,pieceCtx)
 
 nextPiece()
 
-function attach(piece){
+async function attach(piece){
     
     let x
     let y
@@ -117,7 +64,6 @@ function attach(piece){
     for (let i=0; i<piece.position.length; i++){
         [y,x]=piece.position[i]
         if (y<0){
-            console.log("Defeat")
             endGame()
             return
         }
@@ -140,21 +86,19 @@ function attach(piece){
     }
     if(deleteMe.length>0)
     {
-        testBoard.lines+=deleteMe.length
-        cleanRows(deleteMe)
-        eraseBig()
-        score+=deleteMe.length*5*(1+level)//TODO: scale by triangular numbers * 5.  
-        testBoard.zero()
-        buildState(columnsBlock)
+        testBoard.lines+=deleteMe.length 
+        // cleanRows(deleteMe)
+        // eraseBig()
+        // score+=deleteMe.length*5*(1+level)//TODO: scale by triangular numbers * 5.  
+        // testBoard.zero()
+        // buildState(columnsBlock)     
+        await handleDelete(deleteMe)
+        testBoard.render()
     }
     score+=5*(1+level);
     playerScore.value=`score: ${score}`
     testBoard.pieces++
-    setGauge(level*10+(testBoard.lines%8)*1.25)
-    console.log(timeSet)
-    console.log(testBoard.pieces)
-    console.log(columnsBlock)
-    
+    setGauge(level*10+(testBoard.lines%8)*1.25)   
 }
 
 function newLevelCheck(lines,deleteLines){
@@ -169,47 +113,24 @@ function buildState(columnsBlock){
     let x
     let position=[]
     let cellInfo=[]
-    console.log(columnsBlock)
+
     for (let i=0; i<columnsBlock.length;i++){
       for (let j=0; j<columnsBlock[i].length;j++){
         let ypos=columnsBlock[i][j].ypos
         let info=columnsBlock[i][j].data.info
         let color=columnsBlock[i][j].data.color
         x=i
-        // testBoard.set([[ypos,x]],[{info:info,color:color}])
+
         position.push([ypos,x])
         cellInfo.push({info:info,color:color})
       }
-    //   console.log(position)
-    //   console.log(cellInfo)
       testBoard.set(position,cellInfo)
       position=[]
       cellInfo=[]
     }
   }
 
-function cleanRows (deleteArray){
-    let fallDistance = 0;
-    for (let i = 0; i<columnsBlock.length;i++){
-      let deleteIndex=0;
-      fallDistance=0;
-      
-      for (let j=0; j<columnsBlock[i].length; j++){
-        if (deleteArray[deleteIndex]===columnsBlock[i][j].ypos)
-        {
-          columnsBlock[i].splice(j,1)
-          fallDistance++
-          deleteIndex++
-          j--      
-        }
-        else
-        {
-          columnsBlock[i][j].ypos+=fallDistance;
-          
-        }
-      }
-    }
-  }
+
 
 function rotate(blockPiece,direction){
     let kickCount=0;
@@ -231,7 +152,7 @@ function rotate(blockPiece,direction){
         y=center[0]-offset*offSetX[i]
         output.push([y,x])
         if ((y>ROWS-1))//out of bounds y
-            {   console.log("yclip")
+            {
                 return false}
     }
     let centerCopy=[0,0]
@@ -256,7 +177,6 @@ function rotate(blockPiece,direction){
             kickCount++
             if (output[j][1]>COLUMNS-1)
             {return false}
-            console.log("clipRight")
         }
         if (testBoard.clipCheck(output)){
             if(kickCount===1)
@@ -304,7 +224,7 @@ function nextPiece(){
 }
 
 function myTimerFnc(){
-    console.log(` ${timeSet}`)
+
     if (gameOnGoingFlag===false)
     {return}
     if (!nextState.existingPiece){
@@ -317,6 +237,8 @@ function myTimerFnc(){
             pieceColor[newPiece],
             pieceCenter[newPiece],
             5)
+        let randomShift=Math.floor(Math.random()*7)//shift between 0 and 7 spaces right
+        testPiece2.shift([0,randomShift])
         nextState.existingPiece=true
         eraseSmall()
         nextPiece()
@@ -337,6 +259,7 @@ function myTimerFnc(){
         testPiece2.render(ctx)
         testBoard.render()
         nextPiece()
+        drawShadow(ctx,testPiece2,1,0)
     }
     
     // eraseBig()
@@ -345,17 +268,7 @@ function myTimerFnc(){
     // nextPiece()
 }
 
-function pauseAction(){
-    if(pauseFlag===true){
-        clearInterval(myTimer)
-        myTimer = setInterval(myTimerFnc,timeSet);
-        pauseFlag=false;
-        return
-    }
-    clearInterval(myTimer)
-    pauseFlag=true
-    return
-}
+
 
 
 testPiece2.render(ctx,0,1)
@@ -375,9 +288,6 @@ function pieceFlip(blockPiece){
     let output = [];
     let x;
     let y;
-    console.log(offSetX)
-    console.log(offSetY)
-    console.log(center)
     for (let i=0; i<blockPiece.size;i++){
         x=center[1]-offSetX[i]
         y=center[0]+offSetY[i]
@@ -405,6 +315,7 @@ function pieceFlip(blockPiece){
 
 
 document.addEventListener('keydown', (event) => {
+    
     if (testPiece2.flagBottom){return}//gaurd clause.  
     if (pauseFlag===true){
         return
@@ -412,38 +323,42 @@ document.addEventListener('keydown', (event) => {
     if (gameOnGoingFlag===false){return}  
     var name = event.key;
     var code = event.code;
-
     var array=testPiece2.getPosition();
-    console.log(`name ${name} code: ${code}`)
     if (name==='Control'){
-        console.log("control")
         pieceFlip(testPiece2)
+        drawShadow(ctx,testPiece2,1,0)
     }
     if (name==='ArrowRight'){
+        event.preventDefault()
         array.forEach((element) => element[1]++)
         if (testBoard.clipCheck(array)===false){
             testPiece2.move("right")
             eraseBig();
             testPiece2.render(ctx)
             testBoard.render(ctx)
+            drawShadow(ctx,testPiece2,1,0)
         }
     }
     if (name==='ArrowLeft'){
+        event.preventDefault()
         array.forEach((element) => element[1]--)
         if (testBoard.clipCheck(array)===false){
             testPiece2.move("left")
             eraseBig();
             testPiece2.render(ctx)
             testBoard.render(ctx)
+            drawShadow(ctx,testPiece2,1,0)
         }
     }
     if (name==='ArrowDown'){
+        event.preventDefault()
         array.forEach((element) => element[0]++)
         if (testBoard.clipCheck(array)===false){
             testPiece2.move("down")
             eraseBig();
             testPiece2.render(ctx)
             testBoard.render(ctx)
+            drawShadow(ctx,testPiece2,1,0)
         }
         else
         {attach(testPiece2)
@@ -457,6 +372,7 @@ document.addEventListener('keydown', (event) => {
         eraseBig();
         testPiece2.render(ctx)
         testBoard.render(ctx)
+        drawShadow(ctx,testPiece2,1,0)
 
     }   
     if (code==='ShiftRight'){
@@ -464,6 +380,14 @@ document.addEventListener('keydown', (event) => {
         eraseBig();
         testPiece2.render(ctx)
         testBoard.render(ctx)
+        drawShadow(ctx,testPiece2,1,0)
+    }
+    if (code==='Enter'){
+        testPiece2.render(ctx)
+        dropPiece(testPiece2,ctx)
+        eraseBig();
+        testBoard.render(ctx)
+        //drawShadow(ctx,testPiece2,1,0)
     }
     }, false);
 
@@ -478,24 +402,7 @@ function endGame(){
 
 }
 
-function newGame(){
-    if (gameOnGoingFlag===true){
-        return
-    }//sentry
-    gameOnGoingFlag=true;
-    testBoard.zero()
-    testBoard.pieces=0;
-    eraseBig()
-    eraseSmall()
-    clearInterval(myTimer)
-    myTimer = setInterval(myTimerFnc,timeSet);
-    score=0;
-    nextState.nextPiece=[
-        Math.floor(Math.random()*14)+1,
-        Math.floor(Math.random()*14)+1,
-        Math.floor(Math.random()*14)+1]
-        playerScore.value=`score: ${score}`
-}
+
 
 
 let speedButton=[]

@@ -1,0 +1,61 @@
+Piece Kick on rotation//Works properly
+Remove top clip//works properly
+game over conditions//Works properly  
+tweak second window display//works properly
+scale speed up as lines drop//works
+debug, get speeds set properly  //works properly
+upload and get running natively//works properly
+add piece flip//works properly
+add pause key and command and indicator.//works properly    
+add new game button//works properly
+change speed to based on lines.//Works  
+scale score to speed.//works  
+scale score to number of completed lines.  //Works
+add speed selector//works
+fix score if starting at higher speed//works
+add speed meter on css//works
+update speed meter in js//works
+add grid out display for elements//works
+add css for game page//works
+TODO clear and reset data at new game errors creep in otherwise.//works
+add page with commands and rules explanation.  //works
+fix piece centers//done works properly
+add all key commands and rules//key commands work
+have pieces start randomly on x-axis.  //works
+create one key piece drop//works
+    get piece width function, maybe left most and right most columns//works
+    check columns for highest point.  //works
+    return high point for all the columns the piece could drop in.//Works
+    need to get the low point for all columns piece could drop in.//works
+    get drop distance.  //works
+    shift piece down //works
+create piece shadow where piece will fall//works
+    add draw shadow to game loop and test.  //works
+create draw boxes function to draw individual boxes and box strokes //works
+make buttons unselectable by cursor (css probably)//actually event.preventDefault() did it.
+clear piece shadow after drop.  it persists for a tick.  //works
+after line clear current piece doesn't erase properly till next tick, fix//works properly 
+add flashing lines for completion pause and restart game timer 
+    draw transparent box on completed lines//works
+    draw flashing boxes on completed lines  //works
+        have timer that turns flash on and off//Works
+    pause timer//works
+fix box shadow so it's always below falling piece  //works properly
+
+adjust screen size to view window see functions.js
+add end game text
+add power up meter
+add last four pieces maybe?
+
+add kick to piece flip maybe?
+fix timeout, clear interval at start, and remove pause flag.  currently i have the timer running and a flag kicking you out of the loop.
+tweak and clean up css view
+tweak and clean up css rules
+add example of line completion and scoring.  
+clean up banners
+change initial draw state to be blank until new game pushed
+set game initialization into a function.
+make pause unclickable during flash
+remove enter accidentally pausing.  
+
+draw center function//not needed probably draw box covers this
