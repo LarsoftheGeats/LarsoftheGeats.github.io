@@ -3,6 +3,7 @@ var ctx = c.getContext("2d");
 var nextWindow=document.getElementById("nextPiece");
 var pieceCtx=nextWindow.getContext("2d");
 var playerScore=document.getElementById("scoreArea")
+var checkBox=document.getElementById("showCenter")
 ctx.fillStyle = "#000000";
 const HEIGHT =4;
 var timeSet=1000;
@@ -12,6 +13,7 @@ var newGameButton=document.getElementById("newGame")
 var pauseFlag=false;
 var gameOnGoingFlag=false;
 const speedGauge = document.querySelector('.gauge')
+var showCenterFlag=false
 
 let speedDict={
     0:1000,
@@ -51,7 +53,7 @@ for (let i=0; i<COLUMNS;i++){
 initialize(c,ctx)
 initialize(nextWindow,pieceCtx)
 
-nextPiece()
+// nextPiece()
 
 async function attach(piece){
     
@@ -64,7 +66,8 @@ async function attach(piece){
     for (let i=0; i<piece.position.length; i++){
         [y,x]=piece.position[i]
         if (y<0){
-            endGame()
+            endGame(ctx)
+
             return
         }
         color=piece.color
@@ -87,12 +90,11 @@ async function attach(piece){
     if(deleteMe.length>0)
     {
         testBoard.lines+=deleteMe.length 
-        // cleanRows(deleteMe)
-        // eraseBig()
-        // score+=deleteMe.length*5*(1+level)//TODO: scale by triangular numbers * 5.  
-        // testBoard.zero()
-        // buildState(columnsBlock)     
+        //remove pause event handler
+        pauseButton.removeEventListener("click",pauseAction)
         await handleDelete(deleteMe)
+        //re-add pause event handler
+        pauseButton.addEventListener("click",pauseAction)
         testBoard.render()
     }
     score+=5*(1+level);
@@ -249,6 +251,7 @@ function myTimerFnc(){
 
     if (testBoard.clipCheck(array)===true){
         attach(testPiece2)
+        if (gameOnGoingFlag===false){return}
         eraseBig()
         testBoard.render()
         nextPiece()
@@ -257,25 +260,22 @@ function myTimerFnc(){
         {testPiece2.move("down")
         eraseBig()
         testPiece2.render(ctx)
+        if (showCenterFlag===true){
+            testPiece2.drawCenter(ctx)
+        }
         testBoard.render()
         nextPiece()
         drawShadow(ctx,testPiece2,1,0)
     }
-    
-    // eraseBig()
-    // testPiece2.render(ctx)
-    // testBoard.render()
-    // nextPiece()
 }
 
 
 
 
-testPiece2.render(ctx,0,1)
-testPiece2.render(pieceCtx,0,.5)
+// testPiece2.render(ctx,0,1)
 
 testBoard= new Board(ROWS, COLUMNS, ctx,c)
-testBoard.render()
+// testBoard.render()
 
 function pieceFlip(blockPiece){
     let offSetY=[]
@@ -317,9 +317,7 @@ function pieceFlip(blockPiece){
 document.addEventListener('keydown', (event) => {
     
     if (testPiece2.flagBottom){return}//gaurd clause.  
-    if (pauseFlag===true){
-        return
-    }//don't move when paused.
+    if (pauseFlag===true){return}//don't move when paused.
     if (gameOnGoingFlag===false){return}  
     var name = event.key;
     var code = event.code;
@@ -335,6 +333,9 @@ document.addEventListener('keydown', (event) => {
             testPiece2.move("right")
             eraseBig();
             testPiece2.render(ctx)
+            if (showCenterFlag===true){
+                testPiece2.drawCenter(ctx)
+            }
             testBoard.render(ctx)
             drawShadow(ctx,testPiece2,1,0)
         }
@@ -346,6 +347,9 @@ document.addEventListener('keydown', (event) => {
             testPiece2.move("left")
             eraseBig();
             testPiece2.render(ctx)
+            if (showCenterFlag===true){
+                testPiece2.drawCenter(ctx)
+            }
             testBoard.render(ctx)
             drawShadow(ctx,testPiece2,1,0)
         }
@@ -357,20 +361,28 @@ document.addEventListener('keydown', (event) => {
             testPiece2.move("down")
             eraseBig();
             testPiece2.render(ctx)
+            if (showCenterFlag===true){
+                testPiece2.drawCenter(ctx)
+            }
             testBoard.render(ctx)
             drawShadow(ctx,testPiece2,1,0)
         }
         else
-        {attach(testPiece2)
-        eraseBig()
-        testBoard.render()
-        nextPiece()
+        {
+            attach(testPiece2)
+            if (gameOnGoingFlag===false){return}
+            eraseBig()
+            testBoard.render()
+            nextPiece()
         }
     }
     if (code==='ShiftLeft'){
         rotate(testPiece2,"counter")
         eraseBig();
         testPiece2.render(ctx)
+        if (showCenterFlag===true){
+            testPiece2.drawCenter(ctx)
+        }
         testBoard.render(ctx)
         drawShadow(ctx,testPiece2,1,0)
 
@@ -379,10 +391,14 @@ document.addEventListener('keydown', (event) => {
         rotate(testPiece2,"clock")
         eraseBig();
         testPiece2.render(ctx)
+        if (showCenterFlag===true){
+            testPiece2.drawCenter(ctx)
+        }
         testBoard.render(ctx)
         drawShadow(ctx,testPiece2,1,0)
     }
     if (code==='Enter'){
+        event.preventDefault()
         testPiece2.render(ctx)
         dropPiece(testPiece2,ctx)
         eraseBig();
@@ -391,14 +407,19 @@ document.addEventListener('keydown', (event) => {
     }
     }, false);
 
-function endGame(){
+function endGame(context){
+    write("GAME OVER!!!", context, 0)
+    console.log("GAME OVER!!!")
     clearInterval(myTimer)
     gameOnGoingFlag=false
+    pauseFlag=false
     timeSet=1000
-    columnsBlock=[]
+    columnsBlock=[]//clear the column block (maybe do a delete/garbage clean up instead?)
     for (let i=0; i<COLUMNS;i++){
         columnsBlock.push([])
     }
+    level=0
+    toggleSpeedButtons();
 
 }
 
@@ -409,13 +430,25 @@ let speedButton=[]
 for (let i=0; i<11;i++){
     speedButton.push(document.getElementById(`speed${i}`))
     speedButton[i].addEventListener("click",(event)=>{
+        let emptyFlag=false
         if (gameOnGoingFlag===true){return}
-        let speed=event.target.getAttribute("data")
+        let oldSpeed=document.getElementsByClassName("dotted-border-button")[0]
+        if (oldSpeed===undefined){emptyFlag=true}
+        event.target.classList.toggle("dotted-border-button")
+        let speed=parseInt(event.target.getAttribute("data"))
         level=speed
         timeSet=speedDict[level]
+        setGauge(level*10)
+        console.log("pre return")
+        if (emptyFlag){return}
+        console.log("post return")
+        console.log(oldSpeed)
+        oldSpeed.classList.toggle("dotted-border-button")
     })
 
 }
+
+checkBox.addEventListener("click",toggleCenter)
 pauseButton.addEventListener('click',pauseAction)
 newGameButton.addEventListener("click",newGame)
 let myTimer = setInterval(myTimerFnc,timeSet);

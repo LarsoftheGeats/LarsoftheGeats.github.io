@@ -6,14 +6,10 @@ function setGauge(value=10){
 }
 
 function setup(){
-    let height=Math.floor(.95*windowInnerHeight);
-    let width=Math.floor(13*height/25);
+    let canvas = document.getElementById("myCanvas");
 
-    c.height=height;
-    c.width=width
-
-    BOX_HEIGHT=Math.floor(height/ROWS)
-    BOX_WIDTH=Math.floor(width/COLUMNS)
+    BOX_HEIGHT = Math.floor(canvas.height / ROWS);
+    BOX_WIDTH = Math.floor(canvas.width / COLUMNS);
 }//TODO: adjust this to CSS height values
 
 function initialize(canvas, context){
@@ -26,15 +22,35 @@ function eraseBig(){
     initialize(c,ctx)
 }//clear the main game window
 
+function write(message,context=ctx,degree=0){
+    context.save()
+    context.globalAlpha=1
+    context.fillStyle="Black"
+    context.font="48px serif"
+    context.rotate((Math.PI)*degree/180)
+    context.fillText(message,200,200)
+    context.restore()
+}
+
 function eraseSmall(){
     initialize(nextWindow,pieceCtx)
 }//clear the next piece window
+
+function toggleSpeedButtons() {
+    const speedButtons = document.querySelectorAll('.speed'); // Replace with your selector
+  
+    // Toggle visibility of speed buttons
+    speedButtons.forEach(button => {
+      button.classList.toggle('hidden');
+    });
+  }
 
 function newGame(){
     if (gameOnGoingFlag===true){
         return
     }//sentry
     gameOnGoingFlag=true;
+    pauseFlag=false;
     testBoard.zero()
     testBoard.pieces=0;
     testBoard.lines=0;
@@ -50,7 +66,8 @@ function newGame(){
         Math.floor(Math.random()*14)+1,
         Math.floor(Math.random()*14)+1,
         Math.floor(Math.random()*14)+1]
-        playerScore.value=`score: ${score}`
+    playerScore.value=`score: ${score}`
+    toggleSpeedButtons();
 }
 
 function cleanRows (deleteArray){
@@ -77,6 +94,9 @@ function cleanRows (deleteArray){
   }
 
   function pauseAction(){
+    if (gameOnGoingFlag===false){return}//don't toggle the pause if the game isn't going
+    let pauseButton=document.getElementById("pause")
+    pauseButton.classList.toggle("dotted-border-button")
     if(pauseFlag===true){
         clearInterval(myTimer)
         myTimer = setInterval(myTimerFnc,timeSet);
@@ -124,7 +144,7 @@ function getLowestPoint(piece,pieceShadow){
 function flashyLines(lines) {
     return new Promise((resolve)=> {
     let count = 0;
-    let maxCount = 5;
+    let maxCount = 5;//maybe later make flash # and duration adjustable with params.  for now it's at 5
     pauseAction()
 
     function flashingLoop(lines) {
@@ -161,7 +181,7 @@ async function handleDelete(deleteMe){
 function drawFlashBox(lines){
     for (let i=0; i<lines.length; i++){
         y=lines[i]*BOX_HEIGHT  
-        drawBox(ctx,[y,0],BOX_WIDTH*COLUMNS+4,BOX_HEIGHT,'silver','white',.2)
+        drawBox(ctx,[y,0],BOX_WIDTH*COLUMNS+4,BOX_HEIGHT,'silver','white',.5)
     }
 }
 
@@ -187,9 +207,9 @@ function drawShadow(context,piece,scale=1,offset=0){
     for (let i=0;i<location.length;i++){
         let [y,x]=location[i]
         y+=smallestDiff;
-        drawBox(ctx,[scale*(y*BOX_HEIGHT+2+offset),scale*(BOX_WIDTH*x+2)],
-            scale*(BOX_WIDTH-4),
-            scale*(BOX_HEIGHT-4),
+        drawBox(ctx,[scale*(y*BOX_HEIGHT+1+offset),scale*(BOX_WIDTH*x+1)],
+            scale*(BOX_WIDTH-2),
+            scale*(BOX_HEIGHT-2),
             'silver',"black",.5)
 
     }
@@ -197,6 +217,7 @@ function drawShadow(context,piece,scale=1,offset=0){
 }
 
 function drawBox(context,corner,width,height,color,stroke,alpha=1){
+    context.save()
     let [y,x]=corner
     context.globalAlpha=alpha
     context.beginPath();
@@ -206,6 +227,7 @@ function drawBox(context,corner,width,height,color,stroke,alpha=1){
     context.rect(x,y,width,height)
     context.fillStyle=color
     context.fill()
+    context.restore()
 }
 
 function buildDictionary(piece=testPiece2){
@@ -266,6 +288,9 @@ function dropPiece(piece,context){
     piece.render(context,0,1)
 }
 
+function toggleCenter(){
+    showCenterFlag=!showCenterFlag
+}
 function spin (blockPiece,offset){
     let center=blockPiece.center
     let offSetY=[]

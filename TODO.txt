@@ -41,21 +41,26 @@ add flashing lines for completion pause and restart game timer
         have timer that turns flash on and off//Works
     pause timer//works
 fix box shadow so it's always below falling piece  //works properly
+add end game text //works properly
+change initial draw state to be blank until new game pushed//works properly
+set game initialization into a function.//works properly
+make pause unclickable during flash//works properly
+remove enter accidentally pausing.//works properly
+tweak and clean up css view//works will probably always tweak a bit
+draw center function//works
+adjust screen size to view window see functions.js//works, using @media in css
+blank out speed and new game when playing//works
+make pause blink when paused.//works
+make draw center toggleable in options section//works
+fix timeout, clear interval at start, and remove pause flag.  currently i have the timer running and a flag kicking you out of the loop.//works
 
-adjust screen size to view window see functions.js
-add end game text
+tweak and clean up css rules
+clean up banners
+add example of line completion and scoring.  rules section
+add to heroku server
+
+
 add power up meter
 add last four pieces maybe?
 
 add kick to piece flip maybe?
-fix timeout, clear interval at start, and remove pause flag.  currently i have the timer running and a flag kicking you out of the loop.
-tweak and clean up css view
-tweak and clean up css rules
-add example of line completion and scoring.  
-clean up banners
-change initial draw state to be blank until new game pushed
-set game initialization into a function.
-make pause unclickable during flash
-remove enter accidentally pausing.  
-
-draw center function//not needed probably draw box covers this

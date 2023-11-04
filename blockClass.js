@@ -40,16 +40,12 @@ class Piece {
             drawBox(ctx,[scale*(y*BOX_HEIGHT+2+offset),scale*(BOX_WIDTH*x+2)],scale*(BOX_WIDTH-4),
             scale*(BOX_HEIGHT-4),this.color,"black")
         }
-        drawBox(ctx,[scale*(BOX_HEIGHT*centery+4+offset),scale*(BOX_WIDTH*centerx+4)],scale*(BOX_WIDTH-8),
-        scale*(BOX_HEIGHT-8),"white","black")//draw center
-        // ctx.beginPath();
-        // ctx.rect(scale*(BOX_WIDTH*centerx+4),
-        // scale*(BOX_HEIGHT*centery+4+offset),
-        // scale*(BOX_WIDTH-8),
-        // scale*(BOX_HEIGHT-8));
-        // ctx.fillStyle="white"
-        // ctx.fill()
+   }
 
+   drawCenter(ctx,offset=0,scale=1){
+    let [centery,centerx]=this.center
+    drawBox(ctx,[scale*(BOX_HEIGHT*centery+4+offset),scale*(BOX_WIDTH*centerx+4)],scale*(BOX_WIDTH-8),
+    scale*(BOX_HEIGHT-8),"white","black")//draw center
    }
 
     shift(position){
